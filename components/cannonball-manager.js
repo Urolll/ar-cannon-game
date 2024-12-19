@@ -2,7 +2,7 @@ AFRAME.registerComponent('cannonball-manager', {
   schema: {
     position: { type: 'vec3', default: { x: 0, y: 0, z: 0 } },
     direction: { type: 'vec3', default: { x: 0, y: 0, z: -1 } },
-    speed: { type: 'number', default: 3 }
+    speed: { type: 'number', default: 2.5 }
   },
 
   init: function () {
@@ -32,13 +32,14 @@ AFRAME.registerComponent('cannonball-manager', {
 
     cannonball.setAttribute('dynamic-body', { mass: 1 });
 
-    const initialVelocity = {
-      x: direction.x * this.data.speed,
-      y: direction.y * this.data.speed,
-      z: direction.z * this.data.speed
-    };
+    // Use a vec3 for velocity instead of a string
+    const initialVelocity = new THREE.Vector3(
+      direction.x * this.data.speed,
+      direction.y * this.data.speed,
+      direction.z * this.data.speed
+    );
+    cannonball.setAttribute('velocity', initialVelocity);
 
-    cannonball.setAttribute('velocity', `${initialVelocity.x} ${initialVelocity.y} ${initialVelocity.z}`);
     console.log('Initial velocity applied:', initialVelocity);
 
     this.scene.appendChild(cannonball);
@@ -52,23 +53,43 @@ AFRAME.registerComponent('cannonball-manager', {
       canCollide = true;
     }, 100); // 0.1 seconds
 
-    // Detect collision only if allowed by the flag
-    cannonball.addEventListener('collide', function (event) {
+    // Add event listener for collisions
+    cannonball.addEventListener('collide', (event) => {
       if (canCollide) {
-        console.log('Cannonball collided with:', event.detail.body.el);
-        
-        if (event.detail.body.el.classList.contains('marker')) {
-          console.log('Cannonball collided with a marker:', event.detail.body.el);
-          if (cannonball.parentNode) {
-            cannonball.parentNode.removeChild(cannonball);
+        const body = event.detail.body;
+        const targetEl = body ? body.el : null;
+
+        // Check if the body and target element are valid
+        if (targetEl) {
+          console.log('Cannonball collided with:', targetEl);
+
+          // Ensure the target has the right id to handle the collision
+          if (targetEl.id && targetEl.id.includes('HB')) {
+            console.log('Cannonball hit a HitBox!');
+
+            // Remove the cannonball from the scene safely
+            if (cannonball.parentNode) {
+              // Remove the collision listener before removing the cannonball
+              cannonball.removeEventListener('collide', arguments.callee);
+
+              cannonball.parentNode.removeChild(cannonball);
+              console.log('Cannonball removed after collision.');
+            }
           }
+        } else {
+          console.warn('No valid body or element found in the collision event.');
         }
       }
     });
 
+    // Remove the cannonball from the scene after 5 seconds, regardless of collision
     setTimeout(() => {
       if (cannonball.parentNode) {
+        // Ensure collision listener is removed before removal
+        cannonball.removeEventListener('collide', arguments.callee);
+
         cannonball.parentNode.removeChild(cannonball);
+        console.log('Cannonball removed after timeout.');
       }
     }, 5000);
   }
