@@ -9,7 +9,7 @@ AFRAME.registerComponent('cannonball-manager', {
     this.scene = this.el.sceneEl;
   },
 
-  launchCannonball: function (data) {
+    launchCannonball: function (data) {
     const marker = data.marker;  // The marker passed into the function (either green or blue)
     const isGreenTurn = data.isGreenTurn;  // Get the turn information from the data passed
 
@@ -35,7 +35,12 @@ AFRAME.registerComponent('cannonball-manager', {
     console.log('Cannonball initial position set to:', cannonball.getAttribute('position'));
 
     // Set up the cannonball with physics (dynamic body)
-    cannonball.setAttribute('dynamic-body', { mass: 1 });
+    cannonball.setAttribute('dynamic-body', { 
+      shape: 'sphere',
+      mass: 1 
+    });
+
+    console.log('Dynamic body applied:', cannonball.getAttribute('dynamic-body'));
 
     // Append the cannonball to the scene
     this.scene.appendChild(cannonball);
