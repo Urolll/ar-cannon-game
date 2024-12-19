@@ -1,64 +1,75 @@
 AFRAME.registerComponent('cannonball-manager', {
   schema: {
-    position: { type: 'vec3', default: { x: 0, y: 0, z: 0 } }, // Starting position
-    direction: { type: 'vec3', default: { x: 0, y: 0, z: -1 } }, // Launch direction
-    speed: { type: 'number', default: 1 } // Launch speed
+    position: { type: 'vec3', default: { x: 0, y: 0, z: 0 } },
+    direction: { type: 'vec3', default: { x: 0, y: 0, z: -1 } },
+    speed: { type: 'number', default: 3 }
   },
 
   init: function () {
     this.scene = this.el.sceneEl;
   },
 
-launchCannonball: function (data) {
-    const marker = data.marker;  // The marker passed into the function (either green or blue)
-    const isGreenTurn = data.isGreenTurn;  // Get the turn information from the data passed
+  launchCannonball: function (data) {
+    const marker = data.marker;
+    const isGreenTurn = data.isGreenTurn;
 
-    // Determine direction based on the cannon color (green or blue)
     const direction = isGreenTurn
-      ? { x: 1, y: 0.5, z: 0 }  // Green cannon shoots to the right (positive x-axis)
-      : { x: -1, y: 0.5, z: 0 };   // Blue cannon shoots to the left (negative x-axis)
+      ? { x: 1, y: 0, z: 0 }
+      : { x: -1, y: 0, z: 0 };
 
-    // Create the cannonball entity
     const cannonball = document.createElement('a-sphere');
-    cannonball.setAttribute('radius', 0.1);  // Increased size of the cannonball
-    cannonball.setAttribute('color', '#505050');  // Darker gray color for the cannonball
+    cannonball.setAttribute('radius', 0.1);
+    cannonball.setAttribute('color', '#505050');
 
-    // Calculate the cannonball's position relative to the marker (cannon hole position)
     let cannonHolePosition = {
-      x: marker.object3D.position.x + (isGreenTurn ? 0.5 : -0.5),  // Adjust based on color
-      y: marker.object3D.position.y, 
-      z: marker.object3D.position.z + 1  // Adjust to be in front of the cannon
+      x: marker.object3D.position.x + (isGreenTurn ? 0.5 : -0.5),
+      y: marker.object3D.position.y,
+      z: marker.object3D.position.z + 1
     };
 
-    // Set the cannonball's position
     cannonball.setAttribute('position', `${cannonHolePosition.x} ${cannonHolePosition.y} ${cannonHolePosition.z}`);
     console.log('Cannonball initial position set to:', cannonball.getAttribute('position'));
 
-    // Set up the cannonball with physics (dynamic body)
     cannonball.setAttribute('dynamic-body', { mass: 1 });
 
-    // Apply initial velocity (speed * direction)
     const initialVelocity = {
       x: direction.x * this.data.speed,
       y: direction.y * this.data.speed,
       z: direction.z * this.data.speed
     };
-    
+
     cannonball.setAttribute('velocity', `${initialVelocity.x} ${initialVelocity.y} ${initialVelocity.z}`);
     console.log('Initial velocity applied:', initialVelocity);
 
-    // Append the cannonball to the scene
     this.scene.appendChild(cannonball);
-
-    // Log the position after adding to the scene
     console.log('Cannonball added to scene at:', cannonball.getAttribute('position'));
 
-    // Cleanup the cannonball after 5 seconds
+    // Flag to control collision detection
+    let canCollide = false;
+
+    // Delay collision detection for 0.1 seconds
+    setTimeout(() => {
+      canCollide = true;
+    }, 100); // 0.1 seconds
+
+    // Detect collision only if allowed by the flag
+    cannonball.addEventListener('collide', function (event) {
+      if (canCollide) {
+        console.log('Cannonball collided with:', event.detail.body.el);
+        
+        if (event.detail.body.el.classList.contains('marker')) {
+          console.log('Cannonball collided with a marker:', event.detail.body.el);
+          if (cannonball.parentNode) {
+            cannonball.parentNode.removeChild(cannonball);
+          }
+        }
+      }
+    });
+
     setTimeout(() => {
       if (cannonball.parentNode) {
         cannonball.parentNode.removeChild(cannonball);
       }
     }, 5000);
-}
-
+  }
 });
