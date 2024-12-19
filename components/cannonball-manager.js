@@ -2,14 +2,14 @@ AFRAME.registerComponent('cannonball-manager', {
   schema: {
     position: { type: 'vec3', default: { x: 0, y: 0, z: 0 } }, // Starting position
     direction: { type: 'vec3', default: { x: 0, y: 0, z: -1 } }, // Launch direction
-    speed: { type: 'number', default: 10 } // Launch speed
+    speed: { type: 'number', default: 1 } // Launch speed
   },
 
   init: function () {
     this.scene = this.el.sceneEl;
   },
 
-    launchCannonball: function (data) {
+launchCannonball: function (data) {
     const marker = data.marker;  // The marker passed into the function (either green or blue)
     const isGreenTurn = data.isGreenTurn;  // Get the turn information from the data passed
 
@@ -35,12 +35,17 @@ AFRAME.registerComponent('cannonball-manager', {
     console.log('Cannonball initial position set to:', cannonball.getAttribute('position'));
 
     // Set up the cannonball with physics (dynamic body)
-    cannonball.setAttribute('dynamic-body', { 
-      shape: 'sphere',
-      mass: 1 
-    });
+    cannonball.setAttribute('dynamic-body', { mass: 1 });
 
-    console.log('Dynamic body applied:', cannonball.getAttribute('dynamic-body'));
+    // Apply initial velocity (speed * direction)
+    const initialVelocity = {
+      x: direction.x * this.data.speed,
+      y: direction.y * this.data.speed,
+      z: direction.z * this.data.speed
+    };
+    
+    cannonball.setAttribute('velocity', `${initialVelocity.x} ${initialVelocity.y} ${initialVelocity.z}`);
+    console.log('Initial velocity applied:', initialVelocity);
 
     // Append the cannonball to the scene
     this.scene.appendChild(cannonball);
@@ -54,5 +59,6 @@ AFRAME.registerComponent('cannonball-manager', {
         cannonball.parentNode.removeChild(cannonball);
       }
     }, 5000);
-  }
+}
+
 });
