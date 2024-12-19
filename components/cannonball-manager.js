@@ -72,26 +72,47 @@ AFRAME.registerComponent('cannonball-manager', {
     }, 100);
 
     cannonball.addEventListener('collide', (event) => {
-      if (!event.detail.body) {
-        console.error('Collision event body is undefined');
-        return;
-      }
+      if (!canCollide) return;
+      const body = event.detail.body;
+        
+        if (body) {
+          const targetEl = body.el;
 
-      const targetEl = event.detail.body.el;
-      if (!targetEl) return;
+          if (targetEl && targetEl.id && targetEl.id.includes('Cannon')) {
+            console.log('Cannon collision detected');
 
-      // Check for collision with cannon
-      if (targetEl.id && targetEl.id.includes('Cannon')) {
-        console.log('Cannonball hit cannon:', targetEl.id);
-        this.removeCannonball(cannonball);
-      }
-    });
-  },
+            // Get the parent of the collided object
+            const parentEl = targetEl.parentElement;
+
+            if (parentEl) {
+              // Find the a-plane within the parent element
+              const planeEl = parentEl.querySelector('a-plane[id*="hit"]');
+              
+              if (planeEl) {
+                // Set visibility of the plane to true for 1 second
+                planeEl.setAttribute('visible', true);
+
+                // Set a timeout to hide the plane again after 1 second
+                setTimeout(() => {
+                  planeEl.setAttribute('visible', false);
+                }, 1000); // 1 second
+              } else {
+                console.log('No a-plane found with id containing "hit" in parent');
+              }
+            } else {
+              console.error('Parent element not found');
+            }
+          }
+        } else {
+          console.error('No body in collision event');
+        }
+      });
+    },
 
   setupCleanupTimeout(cannonball) {
     setTimeout(() => {
       this.removeCannonball(cannonball);
-    }, 5000);
+    }, 3000);
   },
 
   removeCannonball(cannonball) {
