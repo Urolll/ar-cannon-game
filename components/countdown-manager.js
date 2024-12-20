@@ -1,7 +1,7 @@
 AFRAME.registerComponent('countdown-manager', {
   init: function () {
     this.isGreenTurn = true; // Start with green
-    this.countdown = 1;
+    this.countdown = 5;
     this.isRunning = false;
     this.isShutdown = false; // Add permanent shutdown flag
     this.greenText = document.querySelector('#greenTimer');

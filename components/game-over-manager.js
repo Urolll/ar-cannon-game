@@ -21,20 +21,20 @@ AFRAME.registerComponent('game-over-manager', {
     this.lostText = document.createElement('a-text');
     this.lostText.setAttribute('value', 'YOU LOST');
     this.lostText.setAttribute('color', '#FF0000');
-    this.lostText.setAttribute('scale', '2 2 2');
+    this.lostText.setAttribute('scale', '1.5 1.5 1.5');
     this.lostText.setAttribute('align', 'center');
     this.lostText.setAttribute('rotation', this.textRotation);
-    this.lostText.setAttribute('position', '0 0.5 0');
+    this.lostText.setAttribute('position', '-0.5 0.7 0');
     this.lostText.setAttribute('visible', false);
     this.el.appendChild(this.lostText);
     
     this.wonText = document.createElement('a-text');
     this.wonText.setAttribute('value', 'YOU WON!');
     this.wonText.setAttribute('color', '#00FF00');
-    this.wonText.setAttribute('scale', '2 2 2');
+    this.wonText.setAttribute('scale', '1.5 1.5 1.5');
     this.wonText.setAttribute('align', 'center');
     this.wonText.setAttribute('rotation', this.textRotation);
-    this.wonText.setAttribute('position', '0 0.5 0');
+    this.wonText.setAttribute('position', '-0.5 0.7 0');
     this.wonText.setAttribute('visible', false);
     this.el.appendChild(this.wonText);
   },
