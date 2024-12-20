@@ -30,6 +30,7 @@
       <a-asset-item id="cannonModel" src="assets/cannon.glb"></a-asset-item>
       <img id="cannonImgGreen" src="assets/cannon_green.jpg">
       <img id="cannonImgBlue" src="assets/cannon_blue.jpg">
+      <img id="heartImg" src="assets/heart.png">
     </a-assets>
 
     <!-- Game Managers -->
@@ -70,6 +71,31 @@
         scale="0.8 0.8 0.8"
         model-physics>
       </a-entity>
+
+      <!-- Health Section -->
+      <a-entity id="greenHealth" position="0 0.1 0.5">
+        <a-image 
+          id="heart1"
+          src="#heartImg"
+          position="-0.1 0 0"
+          rotation="-90 180 0"
+          scale="0.1 0.1 0.1">
+        </a-image>
+        <a-image 
+          id="heart2"
+          src="#heartImg"
+          position="0 0 0"
+          rotation="-90 180 0"
+          scale="0.1 0.1 0.1">
+        </a-image>
+        <a-image 
+          id="heart3"
+          src="#heartImg"
+          position="0.1 0 0"
+          rotation="-90 180 0"
+          scale="0.1 0.1 0.1">
+        </a-image>
+      </a-entity>
     </a-marker>
 
     <!-- Blue Cannon Marker (6) -->
@@ -105,6 +131,31 @@
         rotation="0 -90 0"
         scale="0.8 0.8 0.8"
         model-physics>
+      </a-entity>
+
+      <!-- Health Section -->
+      <a-entity id="blueHealth" position="0 0.1 -0.5" rotation="0 180 0">
+        <a-image 
+          id="heart1"
+          src="#heartImg"
+          position="-0.1 0 0"
+          rotation="-90 180 0"
+          scale="0.1 0.1 0.1">
+        </a-image>
+        <a-image 
+          id="heart2"
+          src="#heartImg"
+          position="0 0 0"
+          rotation="-90 180 0"
+          scale="0.1 0.1 0.1">
+        </a-image>
+        <a-image 
+          id="heart3"
+          src="#heartImg"
+          position="0.1 0 0"
+          rotation="-90 180 0"
+          scale="0.1 0.1 0.1">
+        </a-image>
       </a-entity>
     </a-marker>
 
