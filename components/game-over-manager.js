@@ -1,3 +1,6 @@
+//Artem Kiselev, 6580846
+//Thanatat Aruntaravanit, 6580998
+
 AFRAME.registerComponent('game-over-manager', {
   schema: {
     side: { type: 'string', default: 'blue' }

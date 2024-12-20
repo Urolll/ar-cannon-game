@@ -1,3 +1,6 @@
+//Artem Kiselev, 6580846
+//Thanatat Aruntaravanit, 6580998
+
 // Hit effect component
 AFRAME.registerComponent('hit-effect', {
   schema: {

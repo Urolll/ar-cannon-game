@@ -1,3 +1,6 @@
+//Artem Kiselev, 6580846
+//Thanatat Aruntaravanit, 6580998
+
 // Main cannonball manager component
 AFRAME.registerComponent('cannonball-manager', {
   schema: {

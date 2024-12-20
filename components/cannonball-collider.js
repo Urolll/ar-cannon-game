@@ -1,3 +1,6 @@
+//Artem Kiselev, 6580846
+//Thanatat Aruntaravanit, 6580998
+
 AFRAME.registerComponent('cannonball-collider', {
   init: function () {
     this.el.addEventListener('collide', (event) => {

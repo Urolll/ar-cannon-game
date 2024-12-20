@@ -1,3 +1,6 @@
+//Artem Kiselev, 6580846
+//Thanatat Aruntaravanit, 6580998
+
 // Cannon physics component
 AFRAME.registerComponent('model-physics', {
 init: function() {
