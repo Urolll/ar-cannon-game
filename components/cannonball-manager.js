@@ -1,3 +1,141 @@
+// Health management component
+AFRAME.registerComponent('health-manager', {
+  schema: {
+    maxHealth: { type: 'number', default: 3 },
+    side: { type: 'string', default: 'blue' },
+    hitCooldown: { type: 'number', default: 1000 }
+  },
+
+  init() {
+    this.currentHealth = this.data.maxHealth;
+    this.healthContainer = this.el.querySelector(`#${this.data.side}Health`);
+    this.canTakeDamage = true;
+    
+    if (!this.healthContainer) {
+      console.error(`Health container for ${this.data.side} side not found`);
+    }
+
+    // Create game over text entities but keep them hidden
+    this.createGameOverText();
+  },
+
+  createGameOverText() {
+    // Create "You Lost" text
+    this.lostText = document.createElement('a-text');
+    this.lostText.setAttribute('value', 'YOU LOST');
+    this.lostText.setAttribute('color', '#FF0000');
+    this.lostText.setAttribute('scale', '2 2 2');
+    this.lostText.setAttribute('align', 'center');
+    this.lostText.setAttribute('rotation', '-90 180 0');
+    this.lostText.setAttribute('position', '0 0.1 0');
+    this.lostText.setAttribute('visible', false);
+    this.el.appendChild(this.lostText);
+
+    // Create "You Won" text
+    this.wonText = document.createElement('a-text');
+    this.wonText.setAttribute('value', 'YOU WON!');
+    this.wonText.setAttribute('color', '#00FF00');
+    this.wonText.setAttribute('scale', '2 2 2');
+    this.wonText.setAttribute('align', 'center');
+    this.wonText.setAttribute('rotation', '-90 180 0');
+    this.wonText.setAttribute('position', '0 0.1 0');
+    this.wonText.setAttribute('visible', false);
+    this.el.appendChild(this.wonText);
+  },
+
+  gameOver(isWinner) {
+    // Hide health container
+    if (this.healthContainer) {
+      this.healthContainer.setAttribute('visible', false);
+    }
+
+    // Show appropriate text
+    if (isWinner) {
+      this.wonText.setAttribute('visible', true);
+    } else {
+      this.lostText.setAttribute('visible', true);
+    }
+
+    // Emit event for other components/cannons to react
+    this.el.emit('gameOver', { side: this.data.side, isWinner });
+  },
+
+  decreaseHealth() {
+    if (!this.canTakeDamage || this.currentHealth <= 0) {
+      return false;
+    }
+
+    if (this.healthContainer && this.currentHealth > 0) {
+      const hearts = Array.from(this.healthContainer.querySelectorAll('a-image[src*="heart"]'))
+        .reverse();
+      
+      if (hearts.length > 0 && this.currentHealth > 0) {
+        const heartToHide = hearts[this.data.maxHealth - this.currentHealth];
+        if (heartToHide) {
+          heartToHide.setAttribute('visible', false);
+          this.currentHealth--;
+          
+          // Start cooldown
+          this.canTakeDamage = false;
+          setTimeout(() => {
+            this.canTakeDamage = true;
+          }, this.data.hitCooldown);
+
+          // Check for game over
+          if (this.currentHealth <= 0) {
+            // Find and notify the other cannon
+            const otherSide = this.data.side === 'blue' ? 'green' : 'blue';
+            const otherCannon = document.querySelector(`#${otherSide}CannonContainer`);
+            
+            if (otherCannon) {
+              const otherHealthManager = otherCannon.components['health-manager'];
+              if (otherHealthManager) {
+                otherHealthManager.gameOver(true);
+              }
+            }
+            
+            // Trigger game over for this cannon
+            this.gameOver(false);
+          }
+          
+          return true;
+        }
+      }
+    }
+    return false;
+  },
+
+  getHealth() {
+    return this.currentHealth;
+  }
+});
+
+// Hit effect component
+AFRAME.registerComponent('hit-effect', {
+  schema: {
+    effectDuration: { type: 'number', default: 1000 }
+  },
+
+  init() {
+    const side = this.el.getAttribute('health-manager').side;
+    this.hitPlane = this.el.querySelector(`#hit${side.charAt(0).toUpperCase() + side.slice(1)}`);
+    this.canShowEffect = true;
+  },
+
+  showHitEffect() {
+    if (this.hitPlane && this.canShowEffect) {
+      this.canShowEffect = false;
+      this.hitPlane.setAttribute('visible', true);
+      
+      setTimeout(() => {
+        this.hitPlane.setAttribute('visible', false);
+        this.canShowEffect = true;
+      }, this.data.effectDuration);
+    }
+  }
+});
+
+// Main cannonball manager component
 AFRAME.registerComponent('cannonball-manager', {
   schema: {
     position: { 
@@ -22,41 +160,35 @@ AFRAME.registerComponent('cannonball-manager', {
     const { marker, isGreenTurn } = data;
     const direction = isGreenTurn ? { x: 1, y: 0, z: 0 } : { x: -1, y: 0, z: 0 };
     
-    // Create and configure cannonball
     const cannonball = this.createCannonball(marker, isGreenTurn, direction);
-    
-    // Add collision detection with delayed activation
     this.setupCollisionDetection(cannonball);
-    
-    // Add cleanup timeout
     this.setupCleanupTimeout(cannonball);
   },
 
   createCannonball(marker, isGreenTurn, direction) {
     const cannonball = document.createElement('a-sphere');
     
-    // Calculate spawn position
     const cannonHolePosition = {
       x: marker.object3D.position.x + (isGreenTurn ? 0.5 : -0.5),
       y: marker.object3D.position.y,
       z: marker.object3D.position.z + 1
     };
 
-    // Set cannonball properties
     cannonball.setAttribute('radius', 0.1);
     cannonball.setAttribute('color', '#505050');
     cannonball.setAttribute('position', `${cannonHolePosition.x} ${cannonHolePosition.y} ${cannonHolePosition.z}`);
     cannonball.setAttribute('dynamic-body', { mass: 1, shape: 'sphere' });
 
-    // Apply initial velocity
     const initialVelocity = new THREE.Vector3(
       direction.x * this.data.speed,
       direction.y * this.data.speed,
       direction.z * this.data.speed
     );
     cannonball.setAttribute('velocity', initialVelocity);
+    
+    // Add a property to track if this cannonball has already caused damage
+    cannonball.hasDealtDamage = false;
 
-    // Add to scene
     this.scene.appendChild(cannonball);
     console.log('Cannonball spawned at:', cannonball.getAttribute('position'));
     
@@ -66,48 +198,36 @@ AFRAME.registerComponent('cannonball-manager', {
   setupCollisionDetection(cannonball) {
     let canCollide = false;
     
-    // Delay collision detection activation
     setTimeout(() => {
       canCollide = true;
     }, 100);
 
     cannonball.addEventListener('collide', (event) => {
-      if (!canCollide) return;
-      const body = event.detail.body;
-        
-        if (body) {
-          const targetEl = body.el;
+      if (!canCollide || cannonball.hasDealtDamage) return;
+      
+      const targetEl = event.detail.body?.el;
+      if (!targetEl || !targetEl.id || !targetEl.id.includes('Cannon')) return;
 
-          if (targetEl && targetEl.id && targetEl.id.includes('Cannon')) {
-            console.log('Cannon collision detected');
+      const parentEl = targetEl.parentElement;
+      if (!parentEl) return;
 
-            // Get the parent of the collided object
-            const parentEl = targetEl.parentElement;
+      // Handle hit effect
+      const hitEffectComponent = parentEl.components['hit-effect'];
+      if (hitEffectComponent) {
+        hitEffectComponent.showHitEffect();
+      }
 
-            if (parentEl) {
-              // Find the a-plane within the parent element
-              const planeEl = parentEl.querySelector('a-plane[id*="hit"]');
-              
-              if (planeEl) {
-                // Set visibility of the plane to true for 1 second
-                planeEl.setAttribute('visible', true);
-
-                // Set a timeout to hide the plane again after 1 second
-                setTimeout(() => {
-                  planeEl.setAttribute('visible', false);
-                }, 1000); // 1 second
-              } else {
-                console.log('No a-plane found with id containing "hit" in parent');
-              }
-            } else {
-              console.error('Parent element not found');
-            }
-          }
-        } else {
-          console.error('No body in collision event');
+      // Handle health decrease
+      const healthManager = parentEl.components['health-manager'];
+      if (healthManager) {
+        const healthDecreased = healthManager.decreaseHealth();
+        if (healthDecreased) {
+          // Mark this cannonball as having dealt damage
+          cannonball.hasDealtDamage = true;
         }
-      });
-    },
+      }
+    });
+  },
 
   setupCleanupTimeout(cannonball) {
     setTimeout(() => {

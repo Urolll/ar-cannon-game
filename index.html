@@ -39,123 +39,145 @@
 
     <!-- Green Cannon Marker (0) -->
     <a-marker id="greenMarker" type="barcode" value="0">
-      <a-text 
-        id="greenTimer"
-        position="0 0 -1"
-        rotation="-90 180 0"
-        align="center"
-        color="#0f0"
-        scale="2 2 2"
-        value="">
-      </a-text>
-      <a-plane 
-        src="#cannonImgGreen"
-        rotation="-90 -180 0"
-        position="0 -0.1 0"
-        width="1"
-        height="1">
-      </a-plane>
-      <a-plane id="hitGreen"
-        visible="false"
-        color="red"
-        rotation="-90 -180 0"
-        position="0 0 0"
-        width="1.1"
-        height="1.1">
-      </a-plane>
+      <!-- Add container entity with health and hit effect components -->
       <a-entity 
-        id="greenCannon"
-        gltf-model="#cannonModel"
-        position="0 0 0"
-        rotation="0 -90 0"
-        scale="0.8 0.8 0.8"
-        model-physics>
-      </a-entity>
-
-      <!-- Health Section -->
-      <a-entity id="greenHealth" position="0 0.1 0.5">
-        <a-image 
-          id="heart1"
-          src="#heartImg"
-          position="-0.1 0 0"
+        id="greenCannonContainer"
+        health-manager="maxHealth: 3; side: green; hitCooldown: 1000"
+        hit-effect="effectDuration: 1000">
+        
+        <a-text 
+          id="greenTimer"
+          position="0 0 -1"
           rotation="-90 180 0"
-          scale="0.1 0.1 0.1">
-        </a-image>
-        <a-image 
-          id="heart2"
-          src="#heartImg"
+          align="center"
+          color="#0f0"
+          scale="2 2 2"
+          value="">
+        </a-text>
+        
+        <a-plane 
+          src="#cannonImgGreen"
+          rotation="-90 -180 0"
+          position="0 -0.1 0"
+          width="1"
+          height="1">
+        </a-plane>
+        
+        <a-plane 
+          id="hitGreen"
+          visible="false"
+          color="red"
+          rotation="-90 -180 0"
           position="0 0 0"
-          rotation="-90 180 0"
-          scale="0.1 0.1 0.1">
-        </a-image>
-        <a-image 
-          id="heart3"
-          src="#heartImg"
-          position="0.1 0 0"
-          rotation="-90 180 0"
-          scale="0.1 0.1 0.1">
-        </a-image>
+          width="1.1"
+          height="1.1">
+        </a-plane>
+        
+        <a-entity 
+          id="greenCannon"
+          gltf-model="#cannonModel"
+          position="0 0 0"
+          rotation="0 -90 0"
+          scale="0.8 0.8 0.8"
+          model-physics>
+        </a-entity>
+
+        <!-- Health Section -->
+        <a-entity id="greenHealth" position="0 0.1 0.5">
+          <a-image 
+            id="heart1"
+            src="#heartImg"
+            position="-0.1 0 0"
+            rotation="-90 180 0"
+            scale="0.1 0.1 0.1">
+          </a-image>
+          <a-image 
+            id="heart2"
+            src="#heartImg"
+            position="0 0 0"
+            rotation="-90 180 0"
+            scale="0.1 0.1 0.1">
+          </a-image>
+          <a-image 
+            id="heart3"
+            src="#heartImg"
+            position="0.1 0 0"
+            rotation="-90 180 0"
+            scale="0.1 0.1 0.1">
+          </a-image>
+        </a-entity>
       </a-entity>
     </a-marker>
 
     <!-- Blue Cannon Marker (6) -->
     <a-marker id="blueMarker" type="barcode" value="6">
-      <a-text 
-        id="blueTimer"
-        position="0 0 1"
-        rotation="-90 180 180"
-        align="center"
-        color="#00f"
-        scale="2 2 2"
-        value="">
-      </a-text>
-      <a-plane 
-        src="#cannonImgBlue"
-        rotation="-90 0 0"
-        position="0 -0.1 0"
-        width="1"
-        height="1">
-      </a-plane>
-      <a-plane id="hitBlue"
-        visible="false"
-        color="red"
-        rotation="-90 -180 0"
-        position="0 0 0"
-        width="1.1"
-        height="1.1">
-      </a-plane>
+      <!-- Add container entity with health and hit effect components -->
       <a-entity 
-        id="blueCannon"
-        gltf-model="#cannonModel"
-        position="0 0 0"
-        rotation="0 -90 0"
-        scale="0.8 0.8 0.8"
-        model-physics>
-      </a-entity>
-
-      <!-- Health Section -->
-      <a-entity id="blueHealth" position="0 0.1 -0.5" rotation="0 180 0">
-        <a-image 
-          id="heart1"
-          src="#heartImg"
-          position="-0.1 0 0"
-          rotation="-90 180 0"
-          scale="0.1 0.1 0.1">
-        </a-image>
-        <a-image 
-          id="heart2"
-          src="#heartImg"
+        id="blueCannonContainer"
+        health-manager="maxHealth: 3; side: blue; hitCooldown: 1000"
+        hit-effect="effectDuration: 1000">
+        
+        <a-text 
+          id="blueTimer"
+          position="0 0 1"
+          rotation="-90 180 180"
+          align="center"
+          color="#00f"
+          scale="2 2 2"
+          value="">
+        </a-text>
+        
+        <a-plane 
+          src="#cannonImgBlue"
+          rotation="-90 0 0"
+          position="0 -0.1 0"
+          width="1"
+          height="1">
+        </a-plane>
+        
+        <a-plane 
+          id="hitBlue"
+          visible="false"
+          color="red"
+          rotation="-90 -180 0"
           position="0 0 0"
-          rotation="-90 180 0"
-          scale="0.1 0.1 0.1">
-        </a-image>
-        <a-image 
-          id="heart3"
-          src="#heartImg"
-          position="0.1 0 0"
-          rotation="-90 180 0"
-          scale="0.1 0.1 0.1">
-        </a-image>
+          width="1.1"
+          height="1.1">
+        </a-plane>
+        
+        <a-entity 
+          id="blueCannon"
+          gltf-model="#cannonModel"
+          position="0 0 0"
+          rotation="0 -90 0"
+          scale="0.8 0.8 0.8"
+          model-physics>
+        </a-entity>
+
+        <!-- Health Section -->
+        <a-entity id="blueHealth" position="0 0.1 -0.5" rotation="0 180 0">
+          <a-image 
+            id="heart1"
+            src="#heartImg"
+            position="-0.1 0 0"
+            rotation="-90 180 0"
+            scale="0.1 0.1 0.1">
+          </a-image>
+          <a-image 
+            id="heart2"
+            src="#heartImg"
+            position="0 0 0"
+            rotation="-90 180 0"
+            scale="0.1 0.1 0.1">
+          </a-image>
+          <a-image 
+            id="heart3"
+            src="#heartImg"
+            position="0.1 0 0"
+            rotation="-90 180 0"
+            scale="0.1 0.1 0.1">
+          </a-image>
+        </a-entity>
       </a-entity>
     </a-marker>
 
