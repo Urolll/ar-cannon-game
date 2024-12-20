@@ -1,3 +1,4 @@
+// Cannon physics component
 AFRAME.registerComponent('model-physics', {
 init: function() {
     this.el.addEventListener('model-loaded', () => {

@@ -12,7 +12,10 @@
   <!-- Custom Components -->
   <script src="components/countdown-manager.js"></script>
   <script src="components/cannonball-manager.js"></script>
-  <script src="components/cannon.js"></script>
+  <script src="components/model-physics.js"></script>
+  <script src="components/health-manager.js"></script>
+  <script src="components/hit-effect.js"></script>
+  <script src="components/game-over-manager.js"></script>
 </head>
 
 <body style="margin: 0; overflow: hidden;">
@@ -40,9 +43,9 @@
     <!-- Green Cannon Marker (0) -->
     <a-marker id="greenMarker" type="barcode" value="0">
       <!-- Add container entity with health and hit effect components -->
-      <a-entity 
-        id="greenCannonContainer"
-        health-manager="maxHealth: 3; side: green; hitCooldown: 1000"
+      <a-entity id="greenCannonContainer"
+        health-manager="side: green"
+        game-over-manager="side: green"
         hit-effect="effectDuration: 1000">
         
         <a-text 
@@ -112,9 +115,9 @@
     <!-- Blue Cannon Marker (6) -->
     <a-marker id="blueMarker" type="barcode" value="6">
       <!-- Add container entity with health and hit effect components -->
-      <a-entity 
-        id="blueCannonContainer"
-        health-manager="maxHealth: 3; side: blue; hitCooldown: 1000"
+      <a-entity id="blueCannonContainer"
+        health-manager="side: blue"
+        game-over-manager="side: blue"
         hit-effect="effectDuration: 1000">
         
         <a-text 
