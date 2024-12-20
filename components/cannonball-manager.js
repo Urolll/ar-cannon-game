@@ -1,3 +1,19 @@
+// Add a game state manager to track overall game state
+AFRAME.registerComponent('game-state-manager', {
+  init() {
+    this.isGameOver = false;
+    
+    // Listen for game over events from any cannon
+    this.el.sceneEl.addEventListener('cannon-game-over', () => {
+      this.isGameOver = true;
+    });
+  },
+
+  isOver() {
+    return this.isGameOver;
+  }
+});
+
 // Health management component
 AFRAME.registerComponent('health-manager', {
   schema: {
@@ -10,40 +26,48 @@ AFRAME.registerComponent('health-manager', {
     this.currentHealth = this.data.maxHealth;
     this.healthContainer = this.el.querySelector(`#${this.data.side}Health`);
     this.canTakeDamage = true;
+    this.gameStateManager = this.el.sceneEl.components['game-state-manager'];
     
     if (!this.healthContainer) {
       console.error(`Health container for ${this.data.side} side not found`);
     }
 
-    // Create game over text entities but keep them hidden
+    this.textRotation = this.getTextRotation();
     this.createGameOverText();
   },
 
+  getTextRotation() {
+    return this.data.side === 'blue' ? '-90 0 0' : '-90 180 0';
+  },
+
   createGameOverText() {
-    // Create "You Lost" text
     this.lostText = document.createElement('a-text');
     this.lostText.setAttribute('value', 'YOU LOST');
     this.lostText.setAttribute('color', '#FF0000');
     this.lostText.setAttribute('scale', '2 2 2');
     this.lostText.setAttribute('align', 'center');
-    this.lostText.setAttribute('rotation', '-90 180 0');
+    this.lostText.setAttribute('rotation', this.textRotation);
     this.lostText.setAttribute('position', '0 0.1 0');
     this.lostText.setAttribute('visible', false);
     this.el.appendChild(this.lostText);
 
-    // Create "You Won" text
     this.wonText = document.createElement('a-text');
     this.wonText.setAttribute('value', 'YOU WON!');
     this.wonText.setAttribute('color', '#00FF00');
     this.wonText.setAttribute('scale', '2 2 2');
     this.wonText.setAttribute('align', 'center');
-    this.wonText.setAttribute('rotation', '-90 180 0');
+    this.wonText.setAttribute('rotation', this.textRotation);
     this.wonText.setAttribute('position', '0 0.1 0');
     this.wonText.setAttribute('visible', false);
     this.el.appendChild(this.wonText);
   },
 
   gameOver(isWinner) {
+    // Check if game is already over
+    if (this.gameStateManager && this.gameStateManager.isOver()) {
+      return;
+    }
+
     // Hide health container
     if (this.healthContainer) {
       this.healthContainer.setAttribute('visible', false);
@@ -56,11 +80,19 @@ AFRAME.registerComponent('health-manager', {
       this.lostText.setAttribute('visible', true);
     }
 
-    // Emit event for other components/cannons to react
-    this.el.emit('gameOver', { side: this.data.side, isWinner });
+    // Emit global game over event
+    this.el.sceneEl.emit('cannon-game-over', { 
+      side: this.data.side, 
+      isWinner 
+    });
   },
 
   decreaseHealth() {
+    // Check if game is already over
+    if (this.gameStateManager && this.gameStateManager.isOver()) {
+      return false;
+    }
+
     if (!this.canTakeDamage || this.currentHealth <= 0) {
       return false;
     }
@@ -83,7 +115,6 @@ AFRAME.registerComponent('health-manager', {
 
           // Check for game over
           if (this.currentHealth <= 0) {
-            // Find and notify the other cannon
             const otherSide = this.data.side === 'blue' ? 'green' : 'blue';
             const otherCannon = document.querySelector(`#${otherSide}CannonContainer`);
             
@@ -94,7 +125,6 @@ AFRAME.registerComponent('health-manager', {
               }
             }
             
-            // Trigger game over for this cannon
             this.gameOver(false);
           }
           
